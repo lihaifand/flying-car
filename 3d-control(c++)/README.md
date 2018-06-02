@@ -37,19 +37,21 @@ To accomplish this, you will:
 
 1. Implement body rate control
 
-- implement the code in the function `GenerateMotorCommands()`  
-  So we need to redefine the force formulas given in lecture to correspond with these new definitions, as follows:  
+
+- implement the code in the function [QuadControl::GenerateMotorCommands()](QuadControl.cpp#L58-L79) from line 58 to 79.   
+  The force is as follows:  
   $F_{tot} = F0 + F1 + F2 + F3$  
   $\tau_x = (F0 - F1 + F2 - F3) * l$           // This is Roll  
   $\tau_y = (F0 + F1 - F2 - F3) * l$           // This is Pitch    
   $\tau_z = (-F0 + F1 + F2 - F3) * \kappa$      // This is Yaw  
   where l = L / $\sqrt{2}$   -  since, L is defined as half the distance between rotors
 - implement the code in the function `BodyRateControl()`
+[QuadControl::BodyRateControl()](QuadControl.cpp#L97-L112) from line 97 to 112 using P controller by `kpPQR` and moments of inertia. 
 Use body rate error and `kpPQR` to return the command moment.
 - Tune `kpPQR` in `QuadControlParams.txt` to get the vehicle to stop spinning quickly but not overshoot. 
 ```
 #Angle rate gains
-kpPQR = 70, 70, 12
+kpPQR = 40, 40, 12
 ```
 If successful, you should see the rotation of the vehicle about roll (omega.x) get controlled to 0 while other rates remain zero.  Note that the vehicle will keep flying off quite quickly, since the angle is not yet being controlled back to 0.  Also note that some overshoot will happen due to motor dynamics!.
 
@@ -57,7 +59,7 @@ If successful, you should see the rotation of the vehicle about roll (omega.x) g
 2. Implement roll / pitch control
 We won't be worrying about yaw just yet.
 
- - implement the code in the function `RollPitchControl()`
+ - implement the code in the function [QuadControl::RollPitchControl()](QuadControl.cpp#L115-L148) from line 115 to 148 by applying a P controller to the elements R(0,2) and R(1,2) of the rotation matrix R with `kpBank`.
  - Tune `kpBank` in `QuadControlParams.txt` to minimize settling time but avoid too much overshoot
 ```
 # Angle control gains
@@ -75,8 +77,8 @@ Now see the quad level itself (as shown below), though it’ll still be flying a
 
 Next, implement the position, altitude and yaw control for your quad.  For the simulation, you will use `Scenario 3`.  This will create 2 identical quads, one offset from its target point (but initialized with yaw = 0) and second offset from target point but yaw = 45 degrees.
 
-1. implement the code in the function `LateralPositionControl()` and `AltitudeControl()`.
-Use double integral control and tune parameters `kpPosXY`, `kpPosZ`, `kpVelXY` and `kpVelZ`.
+1. implement the code in the function [QuadControl::AltitudeControl()](QuadControl.cpp#L155-L191) from line 155 to 191 and [QuadControl::LateralPositionControl()](QuadControl.cpp#L194-L237) from line 194 to 237.
+Use double integral control and tune parameters `kpPosXY`, `kpPosZ`, `kpVelXY` and `kpVelZ`. 
 ```
 # Position control gains
 kpPosXY = 2.5
@@ -89,7 +91,7 @@ kpVelZ = 20
 
 If successful, the quads should be going to their destination points and tracking error should be going down (as shown below). However, one quad remains rotated in yaw.
 
-2. implement the code in the function `YawControl()`.
+1. implement the code in the function [QuadControl::YawControl()](QuadControl.cpp#L240-L271)from line 240 to 271. This is a P controller using `kpYaw`
  - tune parameters `kpYaw` and the 3rd (z) component of `kpPQR`
 ```
 # Angle control gains
@@ -113,7 +115,7 @@ In this part, we will explore some of the non-idealities and robustness of a con
 
 1. Run your controller & parameter set from Step 3.  Do all the quads seem to be moving OK?  If not, try to tweak the controller parameters to work for all 3 (tip: relax the controller).
 
-2. Edit `AltitudeControl()` to add basic integral control to help with the different-mass vehicle.
+2. Edit [QuadControl::AltitudeControl()](QuadControl.cpp#L155-L191) from line 155 to 191 to add basic integral control to help with the different-mass vehicle.
 
 3. Tune the integral control, and other control parameters until all the quads successfully move properly.  Your drones' motion should look like this:
 
