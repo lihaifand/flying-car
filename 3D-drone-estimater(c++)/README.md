@@ -141,7 +141,7 @@ QYawStd = .1
 ***Success criteria:*** *Your objective is to complete the entire simulation cycle with estimated position error of < 1m.*
 
 
-### Step 6: Adding  3D Drone Controller ###
+### Step 6: Adding 3D Drone Controller ###
 
 Up to this point, we have been working with a controller that has been relaxed to work with an estimated state instead of a real state.  So now, you will see how well your controller performs and de-tune your controller accordingly.
 
