@@ -20,3 +20,8 @@ This is the collection of my side-projects driven by my personal interests.
 - **music-box** (pySpark)  
   - Churn
   - Recommendation
+  
+- **NLP with Deep Learning**
+  - Part of Speech Tagging (HMM)
+  - Machine Translation
+  - DNN Speech Recognizer
