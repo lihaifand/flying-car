@@ -381,6 +381,9 @@ int ProcessParser::getTotalNumberOfProcesses()
 }
 
 bool ProcessParser::isPidExisting(std::string pid) {
-  if (! Util::getStream((Path::basePath() + pid + Path::statusPath()))) return false;
-  return true;
+  vector<string> pid_list = ProcessParser::getPidList();
+  for (string p : pid_list) {
+    if (p == pid) return true;
+  }
+  return false;
 }  
