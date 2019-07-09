@@ -1,19 +1,61 @@
+#include <memory>
 #include "gc_pointer.h"
 #include "LeakTester.h"
 
-int main()
-{
-    Pointer<int> p = new int(19);
-    // std::cout<<"1"<<p << "is" << *p <<std::endl;
-    p = new int(21);
-    // std::cout<<"2"<<p << "is" << *p <<std::endl;
-    p = new int(28);
-    Pointer<int, 2> p1 = new int[2];
-    p1 = new int[2];
-    // std::cout<<"3"<<p << "is" << *p <<std::endl;
-    // p = new int[3];
-    // std::cout<<"4"<<p << "is" << *p <<std::endl;
-    // p.collect();
-    // std::cout<<"5"<<p << "is" << *p <<std::endl;
-    return 0;
+namespace custom {
+    template< typename T>
+    class list {
+        private:
+            struct node{
+            T value;
+            Pointer< node > prev;
+            Pointer< node > next;
+            node(T val, node* _prev, node* _next) : value(val), prev(_prev), next(_next) {}
+            };
+            node* head;
+            node* tail;
+        public:
+
+        // We don't have any destructors or freeing of memory
+            list(): head(NULL), tail(NULL){}
+            void push_back(T);
+            bool empty() const { return ( !head || !tail ); }
+            void print();
+    };
+
+    template <typename T>
+    void list<T>::push_back(T val){
+        list::tail = new node(val, list::tail, NULL);
+        if(list::tail->prev){
+            list::tail->prev->next = list::tail;
+        }
+        if( list::empty()){
+            list::head = list::tail;
+        }
+    }
+
+    template< typename T> 
+    void list<T>::print() { 
+        node* ptr= list::head;  
+        while(ptr) { 
+            std::cout<< ptr->value <<" "; 
+            ptr = ptr->next; 
+        }
+        std::cout << std::endl;
+    }
+}
+
+int main() {
+custom::list< int > list;
+
+std::cout << "Add 5 numbers: " << std::endl;
+for(int i = 0; i < 5; i++) {
+    int temp;
+    std::cout<<"Add "<< i+1<< ". element:"<< std::endl;
+    std::cin >>temp;
+    list.push_back(temp);
+}
+
+list.print();
+return 0;
 }

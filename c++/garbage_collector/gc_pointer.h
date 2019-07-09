@@ -116,11 +116,8 @@ Pointer<T,size>::Pointer(T *t){
 // Copy constructor.
 template< class T, int size>
 Pointer<T,size>::Pointer(const Pointer &ob){
-    typename std::list<PtrDetails<T> >::iterator p = findPtrInfo(ob.addr);
-    
-    isArray = ob.isArray;
-    arraySize = ob.arraySize;
     addr = ob.addr;
+    typename std::list<PtrDetails<T> >::iterator p = findPtrInfo(addr);
     p->refcount++;
 }
 
@@ -129,7 +126,7 @@ template <class T, int size>
 Pointer<T, size>::~Pointer(){
     
     typename std::list<PtrDetails<T> >::iterator p = findPtrInfo(addr);
-    if (p != refContainer.end())
+    if (p->refcount)
         p->refcount--;
     // Collect garbage when a pointer goes out of scope.
     bool collected = collect();
@@ -172,15 +169,14 @@ bool Pointer<T, size>::collect(){
 // Overload assignment of pointer to Pointer.
 template <class T, int size>
 T *Pointer<T, size>::operator=(T *t){
-
+    typename std::list<PtrDetails<T> >::iterator p = findPtrInfo(this->addr);
+    p->refcount--;
     addr = t;
-    isArray = size > 0 ? true : false;
-    arraySize = size;
-    typename std::list<PtrDetails<T> >::iterator p = findPtrInfo(addr);
+    p = findPtrInfo(addr);
     if (p != refContainer.end()) {
         p->refcount++;
     } else {
-        PtrDetails<T> pd(addr, size, isArray);
+        PtrDetails<T> pd(t, size, isArray);
         refContainer.push_back(pd);
     }    
     return addr;
@@ -202,8 +198,6 @@ Pointer<T, size> &Pointer<T, size>::operator=(Pointer &rv){
     // store the address.
     // return
     addr = rv.addr;
-    isArray = rv.isArray;
-    arraySize = rv.arraySize;
     return rv;
 }
 
